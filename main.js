@@ -1,5 +1,6 @@
 var objects = [];
 var status = "";
+var thing = "";
 
 function preload(){
 
@@ -11,14 +12,18 @@ function setup(){
     video = createCapture(VIDEO);
     video.hide();
     video.size(380,380);
-    objectDetector = ml5.objectDetector('cocossd',modelLoaded);
-    document.getElementById("status").innerHTML =  "Object Is Being Detected";
 }
 
 function modelLoaded(){
     console.log("Model Is Initialized");
     status = true;
 
+}
+function start(){
+    objectDetector = ml5.objectDetector('cocossd',modelLoaded);
+    document.getElementById("status").innerHTML =  "Object Is Being Detected";
+
+    thing = document.getElementById('thing').value;
 }
 
 function draw(){
@@ -36,6 +41,19 @@ function draw(){
             stroke(r,g,b);
             text(objects[i].label + " " + percent + "%", objects[i].x + 15, objects[i].y + 15);
             rect(objects[i].x, objects[i].y, objects[i].width, objects[i].height);
+
+            if(thing == objects[i].label){
+                video.stop();
+                objectDetector.detect(gotResults);
+                document.getElementById("status").innerHTML =  thing + " Found"
+                document.getElementById("number").innerHTML = objects.length + " = Number Of Objects Found";
+                var synth = window.speechSynthesis;
+                utterThis = new SpeechSynthesisUtterance(thing + "found");
+                synth.speak(utterThis);
+            }
+            else{
+                document.getElementById("status").innerHTML =  thing + " Not Found"
+            }
          }
 
     }
